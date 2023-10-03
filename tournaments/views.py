@@ -4,6 +4,7 @@ from rest_framework import status
 from .models import Player, Team, Tournament
 from .serializers import PlayerSerializer, TeamSerializer, TournamentSerializer
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
+from rest_framework.decorators import action
 
 
 class ReadOnly(BasePermission):
@@ -76,7 +77,7 @@ class TeamAPIView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class TournamentAPIView(APIView):
+class TournamentsAPIView(APIView):
     permission_classes = [IsAuthenticated|ReadOnly]
     
     def get(self, request):
@@ -107,4 +108,23 @@ class TournamentAPIView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class TournamentAPIView(APIView):
+    permission_classes = [IsAuthenticated|ReadOnly]
+    
+    def get(self, request, pk):
+        tournament = Tournament.objects.get(pk=pk)
+        serializer = TournamentSerializer(tournament)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['POST'])
+    def add_team(self, request, pk):
+        tournament = Tournament.objects.get(pk=pk)
+        serializer = TeamSerializer(data = request.data)
+        if serializer.is_valid():
+            tournament.teams.add(serializer)
+            tournament.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

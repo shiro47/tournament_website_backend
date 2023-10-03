@@ -29,15 +29,18 @@ class Team(models.Model):
 class Tournament(models.Model):
     title = models.CharField(max_length=100, default="undefined")
     description = models.TextField(default="undefined")
-    teams = models.ManyToManyField(Team)
+    rewards = models.TextField(default="undefined")
+    rules = models.TextField(default="undefined")
+    teams = models.ManyToManyField(Team, blank=True)
     
     def __str__(self) -> str:
         return self.title
     
     def clean(self):
         # Check if the number of teams exceeds the limit (20)
-        if self.teams.count() > 20:
-            raise ValidationError("A tournament can have a maximum of 20 teams.")
+        if self.pk is not None:
+            if self.teams.count() > 20:
+                raise ValidationError("A tournament can have a maximum of 20 teams.")
     
     def save(self, *args, **kwargs):
         # Call the clean method before saving

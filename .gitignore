@@ -1,3 +1,5 @@
 \env
 *.env
 *__pycache__
+tournaments/migrations/0002_tournament_rewards_tournament_rules.py
+tournaments/migrations/0003_alter_tournament_teams.py
