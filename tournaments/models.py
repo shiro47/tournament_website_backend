@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
+from django.utils import timezone
 # Create your models here.
 
 class Player(models.Model):
@@ -27,21 +29,24 @@ class Team(models.Model):
         return self.name
 
 class Tournament(models.Model):
-    title = models.CharField(max_length=100, default="undefined")
-    description = models.TextField(default="undefined")
-    rewards = models.TextField(default="undefined")
-    rules = models.TextField(default="undefined")
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    starting_at = models.DateTimeField(default=timezone.now)
+    title = models.CharField(max_length=100, default="")
+    description = models.TextField(default="")
+    rewards = models.TextField(default="")
+    rules = models.TextField(default="")
     teams = models.ManyToManyField(Team, blank=True)
-    
-    def __str__(self) -> str:
+
+    def __str__(self):
         return self.title
-    
+
     def clean(self):
         # Check if the number of teams exceeds the limit (20)
         if self.pk is not None:
             if self.teams.count() > 20:
                 raise ValidationError("A tournament can have a maximum of 20 teams.")
-    
+
     def save(self, *args, **kwargs):
         # Call the clean method before saving
         self.clean()

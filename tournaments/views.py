@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework import status, viewsets
 from .models import Player, Team, Tournament
 from .serializers import PlayerSerializer, TeamSerializer, TournamentSerializer
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
@@ -87,6 +87,7 @@ class TournamentsAPIView(APIView):
 
 
     def post(self, request):
+        request.data['created_by'] = request.user.id
         serializer = TournamentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -111,20 +112,21 @@ class TournamentsAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     
-class TournamentAPIView(APIView):
-    permission_classes = [IsAuthenticated|ReadOnly]
-    
-    def get(self, request, pk):
+class TournamentAPIView(viewsets.ModelViewSet):
+    def retrieve(self, request, pk):
         tournament = Tournament.objects.get(pk=pk)
         serializer = TournamentSerializer(tournament)
         return Response(serializer.data)
     
-    @action(detail=False, methods=['POST'])
+    @action(detail=False, methods=['post'])
     def add_team(self, request, pk):
-        tournament = Tournament.objects.get(pk=pk)
-        serializer = TeamSerializer(data = request.data)
+        try:
+            tournament = Tournament.objects.get(pk=pk)
+        except Tournament.DoesNotExist:
+            return Response("Tournament not found", status=status.HTTP_404_NOT_FOUND)
+        serializer = TeamSerializer(data=request.data)
         if serializer.is_valid():
-            tournament.teams.add(serializer)
-            tournament.save()
+            team = serializer.save() 
+            tournament.teams.add(team)  
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
