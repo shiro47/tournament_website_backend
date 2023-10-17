@@ -3,3 +3,4 @@
 *__pycache__
 tournaments/migrations/
 
+.vscode/settings.json

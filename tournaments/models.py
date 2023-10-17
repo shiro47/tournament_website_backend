@@ -24,9 +24,16 @@ class Team(models.Model):
     player1 = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='team_player1')
     player2 = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='team_player2')
     player3 = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='team_player3')
+    isActive = models.BooleanField(default=False, blank=True)
     
     def __str__(self) -> str:
         return self.name
+    
+    def delete(self, using=None, keep_parents=False):
+        self.player1.delete()
+        self.player2.delete()
+        self.player3.delete()
+        super(Team, self).delete(using, keep_parents)
 
 class Tournament(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
@@ -51,3 +58,7 @@ class Tournament(models.Model):
         # Call the clean method before saving
         self.clean()
         super(Tournament, self).save(*args, **kwargs)
+        
+    def delete(self, using=None, keep_parents=False):
+        self.teams.all().delete()
+        super(Tournament, self).delete(using, keep_parents)
