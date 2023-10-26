@@ -74,7 +74,7 @@ class TeamAPIView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def delete(self, request, pk):
         try:
             team = Team.objects.get(pk=pk)
@@ -89,7 +89,10 @@ class TournamentsAPIView(APIView):
 
     def get(self, request):
         created_by = request.GET.get("created_by")
+        by_title = request.GET.get("title")
         tournaments = Tournament.objects.all()
+        if by_title:
+            tournaments = tournaments.filter(title__icontains=by_title)
         if created_by and created_by.lower() == "true":
             tournaments = tournaments.filter(created_by=request.user.id)
         serializer = TournamentSerializer(tournaments, many=True)
@@ -131,6 +134,7 @@ class TournamentAPIView(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=["patch"], permission_classes=[IsAuthenticated])
     def patch(self, request, pk):
         tournament = Tournament.objects.get(pk=pk)
         serializer = TournamentSerializer(tournament, data=request.data, partial=True)
@@ -139,6 +143,7 @@ class TournamentAPIView(viewsets.ModelViewSet):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=["delete"], permission_classes=[IsAuthenticated])
     def delete(self, request, pk):
         try:
             tournament = Tournament.objects.get(pk=pk)
@@ -147,6 +152,7 @@ class TournamentAPIView(viewsets.ModelViewSet):
         except Tournament.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated]) 
     def accept_team(self, request, pk):
         try:
             team = Team.objects.get(pk=pk)

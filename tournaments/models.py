@@ -51,8 +51,9 @@ class Tournament(models.Model):
     def clean(self):
         # Check if the number of teams exceeds the limit (20)
         if self.pk is not None:
-            if self.teams.count() > 20:
-                raise ValidationError("A tournament can have a maximum of 20 teams.")
+            active_teams_count = self.teams.filter(isActive=True).count()
+            if active_teams_count > 20:
+                raise ValidationError("A tournament can have a maximum of 20 active teams.")
 
     def save(self, *args, **kwargs):
         # Call the clean method before saving
