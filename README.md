@@ -23,6 +23,9 @@ This project aims to provide a robust backend system for organizing and managing
 - **User Authentication:** Secure user authentication for tournament organizers and participants.
 - **API Documentation:** Detailed API documentation for easy integration with the frontend.
 
+## Database
+This project uses PostgreSQL as the database.
+
 ## Getting Started
 
 ### Prerequisites
