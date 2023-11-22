@@ -43,7 +43,7 @@ Make sure you have the following installed:
     ```
 2. Navigate to the project directory:
     ```bash
-   git clone https://github.com/your-username/apex-legends-tournaments-backend.git
+   cd tournament_website_backend
     ```
 3. Install dependencies using Pipenv:
     ```bash
