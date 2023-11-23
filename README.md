@@ -2,6 +2,8 @@
 
 Welcome to the backend repository for the Apex Legends Tournaments website! This Django Rest Framework (DRF) project serves as the backbone for managing and organizing tournaments for the popular game Apex Legends.
 
+[Frontend](https://github.com/shiro47/tournament_website-frontend)
+
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
